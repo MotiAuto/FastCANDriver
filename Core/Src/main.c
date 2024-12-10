@@ -100,6 +100,7 @@ int main(void)
   MX_CAN2_Init();
 
   HAL_CAN_Start(&hcan1);
+  setCurrent(1, ROBOMASTER_M3508, 10000, &tx_packet);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */
@@ -109,7 +110,10 @@ int main(void)
   while (1)
   {
     /* USER CODE END WHILE */
-
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
+	  CAN_TX(0x200, tx_packet.buf_1, &hcan1);
+	  HAL_Delay(20);
+	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */

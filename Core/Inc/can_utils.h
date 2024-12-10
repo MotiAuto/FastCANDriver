@@ -11,15 +11,20 @@
 #include <stdint.h>
 #include "main.h"
 
-void CAN_TX(uint32_t id, uint8_t *txBuf)
+void CAN_TX(uint32_t id, uint8_t *txBuf, CAN_HandleTypeDef* can)
 {
-	CAN_TxHeaderTypeDef TxHeader;
+	static CAN_TxHeaderTypeDef TxHeader;
 	TxHeader.StdId = id;
 	TxHeader.RTR = CAN_RTR_DATA;
 	TxHeader.IDE = CAN_ID_STD;
 	TxHeader.DLC = 8;
 	TxHeader.TransmitGlobalTime = DISABLE;
-	uint32_t TxMailBox;
+	static uint32_t TxMailBox;
+
+	if(HAL_CAN_GetTxMailboxesFreeLevel(can) > 0)
+	{
+		HAL_CAN_AddTxMessage(can, &TxHeader, txBuf, &TxMailBox);
+	}
 }
 
 
