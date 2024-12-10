@@ -17,10 +17,9 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
-#include <can_utils.h>
-#include <robomaster_utils.h>
 #include "main.h"
-
+#include "robomaster_utils.h"
+#include "can_utils.h"
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 
@@ -28,7 +27,9 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
-
+uint8_t rxBuf[8];
+uint8_t dlc;
+uint8_t rxID;
 /* USER CODE END PTD */
 
 /* Private define ------------------------------------------------------------*/
@@ -98,12 +99,11 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
-
-  HAL_CAN_Start(&hcan1);
-  setCurrent(1, ROBOMASTER_M3508, 10000, &tx_packet);
   /* USER CODE BEGIN 2 */
-
+  HAL_CAN_Start(&hcan1);
+  HAL_CAN_ActivateNotification(&hcan1, CAN_IT_RX_FIFO0_MSG_PENDING);
   /* USER CODE END 2 */
+  setCurrent(1, ROBOMASTER_M3508, 5000, &tx_packet);
 
   /* Infinite loop */
   /* USER CODE BEGIN WHILE */
@@ -112,8 +112,9 @@ int main(void)
     /* USER CODE END WHILE */
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_SET);
 	  CAN_TX(0x200, tx_packet.buf_1, &hcan1);
-	  HAL_Delay(20);
+	  HAL_Delay(10);
 	  HAL_GPIO_WritePin(GPIOA, GPIO_PIN_5, GPIO_PIN_RESET);
+	  HAL_Delay(10);
     /* USER CODE BEGIN 3 */
   }
   /* USER CODE END 3 */
