@@ -17,6 +17,8 @@
   */
 /* USER CODE END Header */
 /* Includes ------------------------------------------------------------------*/
+#include <can_utils.h>
+#include <robomaster_utils.h>
 #include "main.h"
 
 /* Private includes ----------------------------------------------------------*/
@@ -70,7 +72,7 @@ static void MX_CAN2_Init(void);
   */
 int main(void)
 {
-
+  RoboMasterTxPacket tx_packet;
   /* USER CODE BEGIN 1 */
 
   /* USER CODE END 1 */
@@ -96,6 +98,8 @@ int main(void)
   MX_USART2_UART_Init();
   MX_CAN1_Init();
   MX_CAN2_Init();
+
+  HAL_CAN_Start(&hcan1);
   /* USER CODE BEGIN 2 */
 
   /* USER CODE END 2 */

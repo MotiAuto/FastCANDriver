@@ -8,80 +8,61 @@
 #ifndef INC_ROBOMASTER_UTILS_H_
 #define INC_ROBOMASTER_UTILS_H_
 
-#include <array>
+#define ROBOMASTER_M3508 3508
+#define ROBOMASTER_M2006 2006
 
-namespace robomaster
+#include <stdint.h>
+
+typedef struct RoboMasterTxPacket
 {
-	enum RoboMasterType
+	uint8_t buf_1[8];
+	uint8_t buf_2[8];
+}RoboMasterTxPacket;
+
+void setCurrent(int id, int type, int16_t current, RoboMasterTxPacket* packet)
+{
+	int16_t target_current = 0;
+	if(type == ROBOMASTER_M2006)
 	{
-		M3508,
-		M2006
-	};
-
-	class RoboMasterHandler
+		if(current > 10000)
+		{
+			target_current = 10000;
+		}
+		else if(current < -10000)
+		{
+			target_current = -10000;
+		}
+		else
+		{
+			target_current = current;
+		}
+	}
+	else if(type == ROBOMASTER_M3508)
 	{
-		public:
-		RoboMasterHandler()
+		if(current > 16384)
 		{
-			for(int i = 0; i < 8; i++)
-			{
-				txBuf1[i] = 0x00;
-				txBuf2[i] = 0x00;
-			}
+			target_current = 16384;
 		}
-
-		void setCurrent(int id, RoboMasterType type, int16_t current)
+		else if(current < -16384)
 		{
-			int16_t target_current = 0;
-			if(type == RoboMasterType::M2006)
-			{
-				if(current > m2006_max_current)
-				{
-					target_current = m2006_max_current;
-				}
-				else if(current < -1.0*m2006_max_current)
-				{
-					target_current = -1.0 * m2006_max_current;
-				}
-				else
-				{
-					target_current = current;
-				}
-			}
-			else if(type == RoboMasterType::M3508)
-			{
-				if(current > m3508_max_current)
-				{
-					target_current = m3508_max_current;
-				}
-				else if(current < -1.0*m3508_max_current)
-				{
-					target_current = -1.0 * m3508_max_current;
-				}
-				else
-				{
-					target_current = current;
-				}
-			}
-
-			if(id < 5)
-			{
-				txBuf1[2*id-2] = (target_current >> 8) & 0xFF;
-				txBuf1[2*id-1] = target_current & 0xFF;
-			}
+			target_current = -16384;
 		}
-
-		std::array<uint8_t, 8> getTxBuf()
+		else
 		{
-
+			target_current = current;
 		}
+	}
 
-		private:
-		uint8_t txBuf1[8];
-		uint8_t txBuf2[8];
-		const int16_t m3508_max_current = 16384;
-		const int16_t m2006_max_current = 10000;
-	};
+	if(id < 5)
+	{
+		packet->buf_1[2*id-2] = (target_current >> 8) & 0xFF;
+		packet->buf_1[2*id-1] = target_current & 0xFF;
+	}
+	else
+	{
+		packet->buf_2[2*id-10] = (target_current >> 8) & 0xFF;
+		packet->buf_2[2*id-9] = target_current & 0xFF;
+	}
 }
 
 
