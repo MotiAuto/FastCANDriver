@@ -19,6 +19,14 @@ typedef struct RoboMasterTxPacket
 	uint8_t buf_2[8];
 }RoboMasterTxPacket;
 
+typedef struct RoboMasterFeedBack
+{
+	int16_t angle[8];
+	int16_t rpm[8];
+	int16_t ampare[8];
+	int8_t temp[8];
+}RoboMasterFeedBack;
+
 void setCurrent(int id, int type, int16_t current, RoboMasterTxPacket* packet)
 {
 	int16_t target_current = 0;
@@ -63,6 +71,16 @@ void setCurrent(int id, int type, int16_t current, RoboMasterTxPacket* packet)
 		packet->buf_2[2*id-10] = (target_current >> 8) & 0xFF;
 		packet->buf_2[2*id-9] = target_current & 0xFF;
 	}
+}
+
+void getFeedBack(int id, uint8_t *buf, RoboMasterFeedBack *rm_fb)
+{
+	int16_t angle_data = buf[0] << 8 | buf[1];
+	int16_t rpm_data = buf[2] << 8 | buf[3];
+	int16_t ampare_data = buf[4] << 8 | buf[5];
+	int8_t temp_data = buf[6];
+
+	rm_fb->ampare[id] = ((double)angle_data/ 8192.0) * 360;
 }
 
 

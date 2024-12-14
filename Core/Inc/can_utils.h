@@ -33,7 +33,7 @@ void CAN_TX(uint32_t id, uint8_t *txBuf, CAN_HandleTypeDef* can)
 
 void CAN_RX_Callback(CAN_HandleTypeDef *can)
 {
-	CAN_RxHeaderTypeDef RxHeader;
+	static CAN_RxHeaderTypeDef RxHeader;
 	uint8_t  rxData[8];
 
 	if(HAL_CAN_GetRxMessage(can, CAN_RX_FIFO0, &RxHeader, rxData) == HAL_OK)
